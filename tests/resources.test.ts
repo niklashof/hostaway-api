@@ -503,7 +503,7 @@ describe('FinancialResource', () => {
       .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
     const client = createClient(fetchMock);
 
-    await client.financial.getStandardFields(755143);
+    await client.financial.getStandardField(755143);
     let [url, init] = fetchMock.mock.calls[0];
     let parsed = new URL(url as string);
     expect(parsed.pathname).toBe('/financeStandardField/reservation/755143');

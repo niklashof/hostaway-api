@@ -16,7 +16,7 @@ export class FinancialResource {
     this.client = client;
   }
 
-  getStandardFields(
+  getStandardField(
     reservationId: number | string
   ): Promise<ApiResponse<FinanceStandardField>> {
     return this.client.request(
