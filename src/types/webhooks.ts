@@ -1,3 +1,4 @@
+// Known event types from Hostaway docs; API may add more over time.
 export const WEBHOOK_EVENT_TYPES = [
   'reservation created',
   'reservation updated',
