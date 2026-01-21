@@ -1,5 +1,9 @@
 import { HostawayAuth, type TokenProvider } from './auth.js';
 import { HostawayError } from './errors.js';
+import { CalendarResource } from './resources/calendar.js';
+import { ConversationsResource } from './resources/conversations.js';
+import { ListingsResource } from './resources/listings.js';
+import { ReservationsResource } from './resources/reservations.js';
 import type { FetchLike, Logger } from './types/common.js';
 
 export interface HostawayClientOptions {
@@ -37,6 +41,10 @@ export class HostawayClient {
   private includeResources?: boolean | string[];
   private logger?: Logger;
   private maxRetries: number;
+  readonly listings: ListingsResource;
+  readonly reservations: ReservationsResource;
+  readonly calendar: CalendarResource;
+  readonly conversations: ConversationsResource;
 
   constructor(options: HostawayClientOptions) {
     this.baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
@@ -57,6 +65,11 @@ export class HostawayClient {
       logger: this.logger,
       tokenProvider: options.tokenProvider,
     });
+
+    this.listings = new ListingsResource(this);
+    this.reservations = new ReservationsResource(this);
+    this.calendar = new CalendarResource(this);
+    this.conversations = new ConversationsResource(this);
   }
 
   async request<T>(
