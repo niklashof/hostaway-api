@@ -392,7 +392,7 @@ describe('LogsResource', () => {
     });
     let [url, init] = fetchMock.mock.calls[0];
     let parsed = new URL(url as string);
-    expect(parsed.pathname).toBe('/reservationWebhooklogs');
+    expect(parsed.pathname).toBe('/reservationWebhookLogs');
     expect(parsed.searchParams.get('limit')).toBe('5');
     expect(parsed.searchParams.get('reservationId')).toBe('12');
     expect(parsed.searchParams.get('listingMapId')).toBe('55');

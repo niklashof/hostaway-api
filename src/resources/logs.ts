@@ -19,7 +19,7 @@ export class LogsResource {
   listReservationWebhookLogs(
     params?: ReservationWebhookLogListParams
   ): Promise<ApiResponse<ReservationWebhookLog[]>> {
-    return this.client.request('GET', '/reservationWebhooklogs', {
+    return this.client.request('GET', '/reservationWebhookLogs', {
       query: params,
     });
   }
@@ -35,7 +35,7 @@ export class LogsResource {
   listConversationMessageWebhookLogs(
     params?: ConversationMessageWebhookLogListParams
   ): Promise<ApiResponse<ConversationMessageWebhookLog[]>> {
-    return this.client.request('GET', '/conversationMessageWebhooklogs', {
+    return this.client.request('GET', '/conversationMessageWebhookLogs', {
       query: params,
     });
   }
