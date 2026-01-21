@@ -78,6 +78,7 @@ export class HostawayAuth {
 
     if (this.tokenProvider?.revokeToken) {
       await this.tokenProvider.revokeToken(tokenToRevoke);
+      this.logger?.debug?.('Hostaway auth: revoked access token via provider.');
       if (tokenToRevoke === this.accessToken) {
         this.invalidateToken();
       }
@@ -101,6 +102,7 @@ export class HostawayAuth {
       throw createErrorFromResponse('Token revocation failed', response, body);
     }
 
+    this.logger?.debug?.('Hostaway auth: revoked access token via API.');
     if (tokenToRevoke === this.accessToken) {
       this.invalidateToken();
     }
@@ -112,6 +114,7 @@ export class HostawayAuth {
       const normalized = normalizeProviderResult(provided);
       this.accessToken = normalized.accessToken;
       this.expiresAt = normalized.expiresAt;
+      this.logger?.debug?.('Hostaway auth: acquired access token via provider.');
       return normalized.accessToken;
     }
 
@@ -157,6 +160,9 @@ export class HostawayAuth {
 
     this.accessToken = token;
     this.expiresAt = resolveExpiresAt(responseBody as Record<string, unknown>);
+    this.logger?.debug?.(
+      'Hostaway auth: acquired access token via client credentials.'
+    );
 
     return token;
   }
