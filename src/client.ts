@@ -96,7 +96,19 @@ export class HostawayClient {
     options: RequestOptions = {}
   ): Promise<T> {
     const normalizedMethod = method.toUpperCase();
-    const url = this.buildUrl(path, options.query);
+    let query = options.query ? { ...options.query } : undefined;
+    if (
+      (normalizedMethod === 'GET' || normalizedMethod === 'HEAD') &&
+      this.includeResources !== undefined
+    ) {
+      if (!query) {
+        query = {};
+      }
+      if (query.includeResources === undefined) {
+        query.includeResources = this.includeResources;
+      }
+    }
+    const url = this.buildUrl(path, query);
 
     let authRetried = false;
     let attempt = 0;
@@ -197,16 +209,7 @@ export class HostawayClient {
   private buildUrl(path: string, query?: Record<string, unknown>): string {
     const normalizedPath = path.replace(/^\/+/, '');
     const url = `${this.baseUrl.replace(/\/+$/, '')}/${normalizedPath}`;
-    const finalQuery = { ...query };
-
-    if (
-      this.includeResources !== undefined &&
-      finalQuery.includeResources === undefined
-    ) {
-      finalQuery.includeResources = this.includeResources;
-    }
-
-    const queryString = buildQueryString(finalQuery);
+    const queryString = buildQueryString(query);
     if (!queryString) {
       return url;
     }
