@@ -63,7 +63,12 @@ describe('ReservationsResource', () => {
     const client = createClient(fetchMock);
 
     await client.reservations.create(
-      { listingId: 3, guestName: 'Ada' },
+      {
+        listingId: 3,
+        arrivalDate: '2024-02-10' as ISODateString,
+        departureDate: '2024-02-11' as ISODateString,
+        guestName: 'Ada',
+      },
       { forceOverbooking: true, validatePaymentMethod: true }
     );
     let [url, init] = fetchMock.mock.calls[0];

@@ -48,26 +48,20 @@ export interface ListingFeeSettings {
 }
 
 export interface CreateListingRequest {
-  name?: string;
+  name: string;
+  propertyTypeId: number;
   city?: string;
   country?: string;
   contactName?: string;
-  propertyTypeId?: number;
   address?: string;
   units?: number;
   [key: string]: unknown;
 }
 
-export interface UpdateListingRequest {
-  name?: string;
-  city?: string;
-  country?: string;
-  contactName?: string;
-  propertyTypeId?: number;
+export type UpdateListingRequest = Partial<CreateListingRequest> & {
   status?: string;
-  address?: string;
   [key: string]: unknown;
-}
+};
 
 export interface ListingFeeSettingsRequest {
   cleaningFee?: number;

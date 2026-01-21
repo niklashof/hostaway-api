@@ -48,10 +48,10 @@ export interface Reservation {
 }
 
 export interface CreateReservationRequest {
-  listingId?: number;
+  listingId: number;
+  arrivalDate: ISODateString;
+  departureDate: ISODateString;
   channelId?: number;
-  arrivalDate?: ISODateString;
-  departureDate?: ISODateString;
   guestName?: string;
   guestsCount?: number;
   totalPrice?: number;
@@ -62,18 +62,11 @@ export interface CreateReservationRequest {
   [key: string]: unknown;
 }
 
-export interface UpdateReservationRequest {
-  arrivalDate?: ISODateString;
-  departureDate?: ISODateString;
-  guestName?: string;
-  guestsCount?: number;
-  totalPrice?: number;
-  currency?: string;
-  status?: ReservationStatus;
-  fees?: ReservationFee[];
-  units?: ReservationUnit[];
+export type UpdateReservationRequest = Partial<
+  Omit<CreateReservationRequest, 'listingId' | 'channelId'>
+> & {
   [key: string]: unknown;
-}
+};
 
 export interface ReservationCreateOptions {
   forceOverbooking?: boolean;
