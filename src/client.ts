@@ -74,12 +74,11 @@ export class HostawayClient {
       let response: Response;
       let didTimeout = false;
       let hadAuthHeader = false;
+      let wasCallerAborted = false;
 
       try {
-        const { signal, cleanup, markTimedOut } = createRequestSignal(
-          options.signal,
-          this.timeoutMs
-        );
+        const { signal, cleanup, markTimedOut, wasCallerAborted: readCallerAbort } =
+          createRequestSignal(options.signal, this.timeoutMs);
         const headers = await this.prepareHeaders(options.headers);
         hadAuthHeader = headers.has('Authorization');
         const body = prepareBody(options.body, headers);
@@ -97,12 +96,21 @@ export class HostawayClient {
           });
         } finally {
           didTimeout = markTimedOut();
+          wasCallerAborted = readCallerAbort();
           cleanup();
         }
       } catch (error) {
         if (isAbortError(error) && didTimeout) {
           throw new HostawayError('Request timed out.', {
             code: 'TIMEOUT',
+            method: normalizedMethod,
+            url,
+          });
+        }
+
+        if (isAbortError(error) && wasCallerAborted) {
+          throw new HostawayError('Request aborted.', {
+            code: 'ABORTED',
             method: normalizedMethod,
             url,
           });
@@ -374,6 +382,7 @@ function createRequestSignal(signal: AbortSignal | undefined, timeoutMs: number)
       signal: undefined as AbortSignal | undefined,
       cleanup: () => {},
       markTimedOut: () => false,
+      wasCallerAborted: () => false,
     };
   }
 
@@ -382,16 +391,22 @@ function createRequestSignal(signal: AbortSignal | undefined, timeoutMs: number)
       signal,
       cleanup: () => {},
       markTimedOut: () => false,
+      wasCallerAborted: () => signal?.aborted ?? false,
     };
   }
 
   const controller = new AbortController();
   let timedOut = false;
+  let callerAborted = false;
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-  const onAbort = () => controller.abort();
+  const onAbort = () => {
+    callerAborted = true;
+    controller.abort();
+  };
   if (signal) {
     if (signal.aborted) {
+      callerAborted = true;
       controller.abort();
     } else {
       signal.addEventListener('abort', onAbort);
@@ -414,6 +429,7 @@ function createRequestSignal(signal: AbortSignal | undefined, timeoutMs: number)
       }
     },
     markTimedOut: () => timedOut,
+    wasCallerAborted: () => callerAborted,
   };
 }
 
