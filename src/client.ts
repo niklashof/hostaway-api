@@ -1,9 +1,15 @@
 import { HostawayAuth, type TokenProvider } from './auth.js';
 import { HostawayError } from './errors.js';
 import { CalendarResource } from './resources/calendar.js';
+import { CommonResource } from './resources/common.js';
 import { ConversationsResource } from './resources/conversations.js';
+import { CouponsResource } from './resources/coupons.js';
+import { FinancialResource } from './resources/financial.js';
 import { ListingsResource } from './resources/listings.js';
+import { LogsResource } from './resources/logs.js';
 import { ReservationsResource } from './resources/reservations.js';
+import { TasksResource } from './resources/tasks.js';
+import { WebhooksResource } from './resources/webhooks.js';
 import type { FetchLike, Logger } from './types/common.js';
 
 export interface HostawayClientOptions {
@@ -45,6 +51,12 @@ export class HostawayClient {
   readonly reservations: ReservationsResource;
   readonly calendar: CalendarResource;
   readonly conversations: ConversationsResource;
+  readonly common: CommonResource;
+  readonly webhooks: WebhooksResource;
+  readonly logs: LogsResource;
+  readonly tasks: TasksResource;
+  readonly coupons: CouponsResource;
+  readonly financial: FinancialResource;
 
   constructor(options: HostawayClientOptions) {
     this.baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
@@ -70,6 +82,12 @@ export class HostawayClient {
     this.reservations = new ReservationsResource(this);
     this.calendar = new CalendarResource(this);
     this.conversations = new ConversationsResource(this);
+    this.common = new CommonResource(this);
+    this.webhooks = new WebhooksResource(this);
+    this.logs = new LogsResource(this);
+    this.tasks = new TasksResource(this);
+    this.coupons = new CouponsResource(this);
+    this.financial = new FinancialResource(this);
   }
 
   async request<T>(

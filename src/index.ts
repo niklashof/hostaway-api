@@ -3,24 +3,53 @@ export type { HostawayClientOptions, RequestOptions } from './client.js';
 export { HostawayError } from './errors.js';
 export type { TokenProvider, TokenProviderResult } from './auth.js';
 export { CalendarResource } from './resources/calendar.js';
+export { CommonResource } from './resources/common.js';
 export { ConversationsResource } from './resources/conversations.js';
+export { CouponsResource } from './resources/coupons.js';
+export { FinancialResource } from './resources/financial.js';
 export { ListingsResource } from './resources/listings.js';
+export { LogsResource } from './resources/logs.js';
 export { ReservationsResource } from './resources/reservations.js';
+export { TasksResource } from './resources/tasks.js';
+export { WebhooksResource } from './resources/webhooks.js';
+export { WEBHOOK_EVENT_TYPES } from './types/index.js';
 export type {
   ApiResponse,
+  Amenity,
   CalendarDay,
   CalendarIntervalUpdateRequest,
   CalendarListParams,
   CalendarPriceDetailsRequest,
   CalendarPriceDetailsResponse,
   CalendarUpdateRequest,
+  CancellationPolicy,
+  CancellationPolicyChannel,
+  CancellationPolicyItem,
+  BedType,
   Conversation,
   ConversationMessage,
+  ConversationMessageWebhook,
+  ConversationMessageWebhookLog,
+  ConversationMessageWebhookLogListParams,
   ConversationsListParams,
+  CreateConversationMessageWebhookRequest,
   CreateConversationMessageRequest,
   CreateListingRequest,
+  CreateReservationCouponRequest,
+  CreateReservationWebhookRequest,
   CreateReservationRequest,
+  CreateTaskRequest,
+  CreateUnifiedWebhookRequest,
+  Coupon,
+  CouponType,
   FetchLike,
+  FinanceStandardField,
+  FinancialReportDateType,
+  FinancialReportDelimiter,
+  FinancialReportFormat,
+  FinancialReportRequest,
+  FinancialReportResult,
+  FinancialReportSortOrder,
   IncludeResourcesParams,
   ISODateString,
   ISODateTimeString,
@@ -32,14 +61,30 @@ export type {
   ListParams,
   Logger,
   MessageTemplate,
+  PropertyType,
   Pagination,
+  ReservationCoupon,
+  ReservationCouponIdResult,
   Reservation,
   ReservationCreateOptions,
   ReservationFee,
+  ReservationWebhook,
+  ReservationWebhookLog,
+  ReservationWebhookLogListParams,
   ReservationStatus,
   ReservationUnit,
   ReservationsListParams,
   ReservationUpdateOptions,
+  Task,
+  TaskStatus,
+  TasksListParams,
+  UnifiedWebhook,
+  UnifiedWebhookLog,
+  UnifiedWebhookLogListParams,
   UpdateListingRequest,
+  UpdateReservationWebhookRequest,
   UpdateReservationRequest,
+  UpdateTaskRequest,
+  UpdateUnifiedWebhookRequest,
+  WebhookEventType,
 } from './types/index.js';

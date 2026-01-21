@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { HostawayClient } from '../src/client.js';
-import type { ISODateString } from '../src/types/common.js';
+import type { ISODateString, ISODateTimeString } from '../src/types/common.js';
 
 function jsonResponse(body: Record<string, unknown>, init: ResponseInit = {}): Response {
   const headers = new Headers(init.headers ?? {});
@@ -298,5 +298,248 @@ describe('IncludeResources overrides', () => {
     [url] = fetchMock.mock.calls[0];
     parsed = new URL(url as string);
     expect(parsed.searchParams.getAll('includeResources')).toEqual(['photos']);
+  });
+});
+
+describe('CommonResource', () => {
+  it('builds common endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.common.listAmenities();
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/amenities');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.common.listBedTypes();
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/bedTypes');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.common.listPropertyTypes();
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/propertyTypes');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.common.listVrboCancellationPolicies();
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/cancellationPolicies/vrbo');
+    expect(init?.method).toBe('GET');
+  });
+});
+
+describe('WebhooksResource', () => {
+  it('builds webhook endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.webhooks.listReservationWebhooks();
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/webhooks/reservations');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.webhooks.createConversationMessageWebhook({
+      url: 'https://example.com/hook',
+      login: 'user',
+    });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/webhooks/conversationMessages');
+    expect(init?.method).toBe('POST');
+    expect(JSON.parse(init?.body as string)).toMatchObject({
+      url: 'https://example.com/hook',
+      login: 'user',
+    });
+
+    fetchMock.mockClear();
+    await client.webhooks.deleteUnifiedWebhook(44);
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/webhooks/unifiedWebhooks/44');
+    expect(init?.method).toBe('DELETE');
+  });
+
+  it('exposes webhook event types', () => {
+    const client = createClient(vi.fn());
+    expect(client.webhooks.listEventTypes()).toContain('reservation created');
+  });
+});
+
+describe('LogsResource', () => {
+  it('builds webhook log endpoints with filters', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.logs.listReservationWebhookLogs({
+      limit: 5,
+      reservationId: 12,
+      listingMapId: 55,
+    });
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/reservationWebhooklogs');
+    expect(parsed.searchParams.get('limit')).toBe('5');
+    expect(parsed.searchParams.get('reservationId')).toBe('12');
+    expect(parsed.searchParams.get('listingMapId')).toBe('55');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.logs.listUnifiedWebhookLogs({ unifiedWebhookId: 9 });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/unifiedWebhookLogs');
+    expect(parsed.searchParams.get('unifiedWebhookId')).toBe('9');
+    expect(init?.method).toBe('GET');
+  });
+});
+
+describe('TasksResource', () => {
+  it('builds task endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.tasks.list({
+      limit: 2,
+      status: 'pending',
+      canStartFromStart: '2024-02-01 00:00:00' as ISODateTimeString,
+    });
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/tasks');
+    expect(parsed.searchParams.get('limit')).toBe('2');
+    expect(parsed.searchParams.get('status')).toBe('pending');
+    expect(parsed.searchParams.get('canStartFromStart')).toBe('2024-02-01 00:00:00');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.tasks.create({
+      title: 'Restock supplies',
+      listingMapId: 12,
+    });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/tasks');
+    expect(init?.method).toBe('POST');
+    expect(JSON.parse(init?.body as string)).toMatchObject({
+      title: 'Restock supplies',
+      listingMapId: 12,
+    });
+
+    fetchMock.mockClear();
+    await client.tasks.update(44, { status: 'completed' });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/tasks/44');
+    expect(init?.method).toBe('PUT');
+
+    fetchMock.mockClear();
+    await client.tasks.delete('task/alpha');
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/tasks/task%2Falpha');
+    expect(init?.method).toBe('DELETE');
+  });
+});
+
+describe('CouponsResource', () => {
+  it('builds coupon endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.coupons.list();
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/coupons');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.coupons.createReservationCoupon({
+      couponName: 'COUPON42',
+      listingMapId: 123,
+      startingDate: '2024-02-01' as ISODateString,
+      endingDate: '2024-02-03' as ISODateString,
+    });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/reservationCoupons');
+    expect(init?.method).toBe('POST');
+    expect(JSON.parse(init?.body as string)).toMatchObject({
+      couponName: 'COUPON42',
+      listingMapId: 123,
+    });
+
+    fetchMock.mockClear();
+    await client.coupons.listReservationCoupons();
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/reservationCoupons');
+    expect(init?.method).toBe('GET');
+  });
+});
+
+describe('FinancialResource', () => {
+  it('builds financial endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.financial.getStandardFields(755143);
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/financeStandardField/reservation/755143');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.financial.standardReport({
+      listingMapIds: [123],
+      fromDate: '2019-01-30' as ISODateString,
+      toDate: '2019-02-25' as ISODateString,
+      format: 'csv',
+    });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/finance/report/standard');
+    expect(init?.method).toBe('POST');
+
+    fetchMock.mockClear();
+    await client.financial.consolidatedReport({ format: 'json' });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/finance/report/consolidated');
+    expect(init?.method).toBe('POST');
+
+    fetchMock.mockClear();
+    await client.financial.calculatedReport({ format: 'json' });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/finance/report/calculated');
+    expect(init?.method).toBe('POST');
+
+    fetchMock.mockClear();
+    await client.financial.listingFinancialsReport({ format: 'json' });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/finance/report/listingFinancials');
+    expect(init?.method).toBe('POST');
   });
 });
