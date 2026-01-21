@@ -98,7 +98,7 @@ describe('ReservationsResource', () => {
 
     await client.reservations.create(
       {
-        listingId: 3,
+        listingMapId: 3,
         arrivalDate: '2024-02-10' as ISODateString,
         departureDate: '2024-02-11' as ISODateString,
         guestName: 'Ada',
@@ -112,7 +112,7 @@ describe('ReservationsResource', () => {
     expect(parsed.searchParams.get('validatePaymentMethod')).toBe('1');
     expect(init?.method).toBe('POST');
     expect(JSON.parse(init?.body as string)).toMatchObject({
-      listingId: 3,
+      listingMapId: 3,
       guestName: 'Ada',
     });
 
@@ -175,8 +175,9 @@ describe('CalendarResource', () => {
 
     fetchMock.mockClear();
     await client.calendar.update(7, {
-      date: '2024-01-05' as ISODateString,
-      available: true,
+      startDate: '2024-01-05' as ISODateString,
+      endDate: '2024-01-05' as ISODateString,
+      isAvailable: true,
       price: 200,
     });
     [url, init] = fetchMock.mock.calls[0];
@@ -188,7 +189,7 @@ describe('CalendarResource', () => {
     await client.calendar.updateIntervals(7, {
       startDate: '2024-01-01' as ISODateString,
       endDate: '2024-01-31' as ISODateString,
-      closed: true,
+      closedOnArrival: true,
     });
     [url, init] = fetchMock.mock.calls[0];
     parsed = new URL(url as string);

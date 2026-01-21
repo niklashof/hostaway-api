@@ -201,6 +201,46 @@ describe('HostawayClient', () => {
     });
   });
 
+  it('returns text for non-JSON responses', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response('a,b\n1,2', {
+        status: 200,
+        headers: { 'content-type': 'text/csv' },
+      })
+    );
+
+    const client = new HostawayClient({
+      baseUrl: 'https://api.test',
+      fetch: fetchMock,
+      accessToken: 'token-1',
+      timeoutMs: 0,
+    });
+
+    const result = await client.request('GET', '/reports');
+
+    expect(result).toBe('a,b\n1,2');
+  });
+
+  it('does not inject includeResources on non-GET requests', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(jsonResponse({ ok: true }, { status: 200 }));
+
+    const client = new HostawayClient({
+      baseUrl: 'https://api.test',
+      fetch: fetchMock,
+      accessToken: 'token-1',
+      timeoutMs: 0,
+      includeResources: true,
+    });
+
+    await client.request('POST', '/sample', { body: { ok: true } });
+    const [url] = fetchMock.mock.calls[0];
+    const parsed = new URL(url as string);
+
+    expect(parsed.searchParams.has('includeResources')).toBe(false);
+  });
+
   it('returns timeout errors for timed out requests', async () => {
     vi.useFakeTimers();
 
