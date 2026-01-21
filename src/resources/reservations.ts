@@ -18,7 +18,21 @@ export class ReservationsResource {
   }
 
   list(params?: ReservationsListParams): Promise<ApiResponse<Reservation[]>> {
-    return this.client.request('GET', '/reservations', { query: params });
+    if (!params) {
+      return this.client.request('GET', '/reservations');
+    }
+
+    const query = { ...params } as Record<string, unknown>;
+    const resolvedSortOrder = (query.sortOrder ?? query.order) as
+      | string
+      | undefined;
+    if (resolvedSortOrder !== undefined) {
+      // Docs list sortOrder, older examples use order, so send both.
+      query.sortOrder = resolvedSortOrder;
+      query.order = resolvedSortOrder;
+    }
+
+    return this.client.request('GET', '/reservations', { query });
   }
 
   get(reservationId: number | string): Promise<ApiResponse<Reservation>> {

@@ -1,7 +1,7 @@
 import type { ISODateString, ISODateTimeString, ListParams } from './common.js';
 
-export interface ReservationsListParams extends Pick<ListParams, 'limit' | 'offset'> {
-  order?: 'asc' | 'desc' | string;
+export interface ReservationsListParams
+  extends Pick<ListParams, 'limit' | 'offset' | 'sortOrder'> {
   channelId?: number | string;
   listingId?: number | string;
   arrivalStartDate?: ISODateString;
