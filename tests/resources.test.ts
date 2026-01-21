@@ -363,6 +363,59 @@ describe('WebhooksResource', () => {
       url: 'https://example.com/hook',
       login: 'user',
     });
+  });
+
+  it('exposes webhook event types', () => {
+    const client = createClient(vi.fn());
+    expect(client.webhooks.listEventTypes()).toContain('reservation created');
+  });
+
+  it('builds webhook update/delete endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.webhooks.updateReservationWebhook(12, { isEnabled: false });
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/webhooks/reservations/12');
+    expect(init?.method).toBe('PUT');
+    expect(JSON.parse(init?.body as string)).toMatchObject({ isEnabled: false });
+
+    fetchMock.mockClear();
+    await client.webhooks.deleteReservationWebhook(12);
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/webhooks/reservations/12');
+    expect(init?.method).toBe('DELETE');
+
+    fetchMock.mockClear();
+    await client.webhooks.updateConversationMessageWebhook('abc/1', {
+      url: 'https://example.com/callback',
+    });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/webhooks/conversationMessages/abc%2F1');
+    expect(init?.method).toBe('PUT');
+    expect(JSON.parse(init?.body as string)).toMatchObject({
+      url: 'https://example.com/callback',
+    });
+
+    fetchMock.mockClear();
+    await client.webhooks.deleteConversationMessageWebhook('abc/1');
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/webhooks/conversationMessages/abc%2F1');
+    expect(init?.method).toBe('DELETE');
+
+    fetchMock.mockClear();
+    await client.webhooks.updateUnifiedWebhook(44, { isEnabled: true });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/webhooks/unifiedWebhooks/44');
+    expect(init?.method).toBe('PUT');
+    expect(JSON.parse(init?.body as string)).toMatchObject({ isEnabled: true });
 
     fetchMock.mockClear();
     await client.webhooks.deleteUnifiedWebhook(44);
@@ -370,11 +423,6 @@ describe('WebhooksResource', () => {
     parsed = new URL(url as string);
     expect(parsed.pathname).toBe('/webhooks/unifiedWebhooks/44');
     expect(init?.method).toBe('DELETE');
-  });
-
-  it('exposes webhook event types', () => {
-    const client = createClient(vi.fn());
-    expect(client.webhooks.listEventTypes()).toContain('reservation created');
   });
 });
 
@@ -404,6 +452,20 @@ describe('LogsResource', () => {
     parsed = new URL(url as string);
     expect(parsed.pathname).toBe('/unifiedWebhookLogs');
     expect(parsed.searchParams.get('unifiedWebhookId')).toBe('9');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.logs.listConversationMessageWebhookLogs({
+      limit: 3,
+      reservationId: 7,
+      listingMapId: 19,
+    });
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/conversationMessageWebhookLogs');
+    expect(parsed.searchParams.get('limit')).toBe('3');
+    expect(parsed.searchParams.get('reservationId')).toBe('7');
+    expect(parsed.searchParams.get('listingMapId')).toBe('19');
     expect(init?.method).toBe('GET');
   });
 });
