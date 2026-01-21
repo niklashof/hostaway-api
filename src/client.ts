@@ -28,7 +28,7 @@ export interface HostawayClientOptions {
 }
 
 export interface RequestOptions {
-  query?: Record<string, unknown>;
+  query?: Record<string, unknown> | object;
   body?: unknown;
   headers?: HeadersInit;
   signal?: AbortSignal;
@@ -96,7 +96,9 @@ export class HostawayClient {
     options: RequestOptions = {}
   ): Promise<T> {
     const normalizedMethod = method.toUpperCase();
-    let query = options.query ? { ...options.query } : undefined;
+    let query = options.query
+      ? { ...(options.query as Record<string, unknown>) }
+      : undefined;
     if (
       (normalizedMethod === 'GET' || normalizedMethod === 'HEAD') &&
       this.includeResources !== undefined
@@ -206,7 +208,7 @@ export class HostawayClient {
     await this.auth.revokeToken(token);
   }
 
-  private buildUrl(path: string, query?: Record<string, unknown>): string {
+  private buildUrl(path: string, query?: Record<string, unknown> | object): string {
     const normalizedPath = path.replace(/^\/+/, '');
     const url = `${this.baseUrl.replace(/\/+$/, '')}/${normalizedPath}`;
     const queryString = buildQueryString(query);
@@ -279,12 +281,12 @@ function isBodyInit(body: unknown): body is BodyInit {
   return false;
 }
 
-function buildQueryString(params?: Record<string, unknown>): string {
+function buildQueryString(params?: Record<string, unknown> | object): string {
   if (!params) {
     return '';
   }
   const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
+  for (const [key, value] of Object.entries(params as Record<string, unknown>)) {
     if (value === undefined) {
       continue;
     }
