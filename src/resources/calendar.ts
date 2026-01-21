@@ -9,6 +9,9 @@ import type {
   CalendarUpdateRequest,
 } from '../types/calendar.js';
 
+const encodePathParam = (value: number | string): string =>
+  encodeURIComponent(String(value));
+
 export class CalendarResource {
   private client: HostawayClient;
 
@@ -20,18 +23,26 @@ export class CalendarResource {
     listingId: number | string,
     params?: CalendarListParams
   ): Promise<ApiResponse<CalendarDay[]>> {
-    return this.client.request('GET', `/listings/${listingId}/calendar`, {
-      query: params,
-    });
+    return this.client.request(
+      'GET',
+      `/listings/${encodePathParam(listingId)}/calendar`,
+      {
+        query: params,
+      }
+    );
   }
 
   update(
     listingId: number | string,
     payload: CalendarUpdateRequest
   ): Promise<ApiResponse<CalendarDay[]>> {
-    return this.client.request('PUT', `/listings/${listingId}/calendar`, {
-      body: payload,
-    });
+    return this.client.request(
+      'PUT',
+      `/listings/${encodePathParam(listingId)}/calendar`,
+      {
+        body: payload,
+      }
+    );
   }
 
   updateIntervals(
@@ -40,7 +51,7 @@ export class CalendarResource {
   ): Promise<ApiResponse<CalendarDay[]>> {
     return this.client.request(
       'PUT',
-      `/listings/${listingId}/calendarIntervals`,
+      `/listings/${encodePathParam(listingId)}/calendarIntervals`,
       {
         body: payload,
       }
@@ -51,8 +62,12 @@ export class CalendarResource {
     listingId: number | string,
     payload: CalendarPriceDetailsRequest
   ): Promise<ApiResponse<CalendarPriceDetailsResponse>> {
-    return this.client.request('POST', `/listings/${listingId}/calendar/priceDetails`, {
-      body: payload,
-    });
+    return this.client.request(
+      'POST',
+      `/listings/${encodePathParam(listingId)}/calendar/priceDetails`,
+      {
+        body: payload,
+      }
+    );
   }
 }

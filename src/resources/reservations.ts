@@ -10,6 +10,9 @@ import type {
   UpdateReservationRequest,
 } from '../types/reservations.js';
 
+const encodePathParam = (value: number | string): string =>
+  encodeURIComponent(String(value));
+
 export class ReservationsResource {
   private client: HostawayClient;
 
@@ -36,7 +39,10 @@ export class ReservationsResource {
   }
 
   get(reservationId: number | string): Promise<ApiResponse<Reservation>> {
-    return this.client.request('GET', `/reservations/${reservationId}`);
+    return this.client.request(
+      'GET',
+      `/reservations/${encodePathParam(reservationId)}`
+    );
   }
 
   create(
@@ -62,10 +68,14 @@ export class ReservationsResource {
     options?: ReservationUpdateOptions
   ): Promise<ApiResponse<Reservation>> {
     const query = options?.forceOverbooking ? { forceOverbooking: 1 } : undefined;
-    return this.client.request('PUT', `/reservations/${reservationId}`, {
-      query,
-      body: payload,
-    });
+    return this.client.request(
+      'PUT',
+      `/reservations/${encodePathParam(reservationId)}`,
+      {
+        query,
+        body: payload,
+      }
+    );
   }
 
   updateStatus(
@@ -74,13 +84,18 @@ export class ReservationsResource {
   ): Promise<ApiResponse<Reservation>> {
     return this.client.request(
       'PUT',
-      `/reservations/${reservationId}/statuses/${status}`
+      `/reservations/${encodePathParam(reservationId)}/statuses/${encodePathParam(
+        status
+      )}`
     );
   }
 
   delete(
     reservationId: number | string
   ): Promise<ApiResponse<unknown> | undefined> {
-    return this.client.request('DELETE', `/reservations/${reservationId}`);
+    return this.client.request(
+      'DELETE',
+      `/reservations/${encodePathParam(reservationId)}`
+    );
   }
 }

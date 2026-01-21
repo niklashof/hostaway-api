@@ -7,6 +7,9 @@ import type {
   CreateConversationMessageRequest,
 } from '../types/conversations.js';
 
+const encodePathParam = (value: number | string): string =>
+  encodeURIComponent(String(value));
+
 export class ConversationsResource {
   private client: HostawayClient;
 
@@ -19,7 +22,10 @@ export class ConversationsResource {
   }
 
   get(conversationId: number | string): Promise<ApiResponse<Conversation>> {
-    return this.client.request('GET', `/conversations/${conversationId}`);
+    return this.client.request(
+      'GET',
+      `/conversations/${encodePathParam(conversationId)}`
+    );
   }
 
   listMessages(
@@ -27,7 +33,7 @@ export class ConversationsResource {
   ): Promise<ApiResponse<ConversationMessage[]>> {
     return this.client.request(
       'GET',
-      `/conversations/${conversationId}/messages`
+      `/conversations/${encodePathParam(conversationId)}/messages`
     );
   }
 
@@ -37,7 +43,9 @@ export class ConversationsResource {
   ): Promise<ApiResponse<ConversationMessage>> {
     return this.client.request(
       'GET',
-      `/conversations/${conversationId}/messages/${conversationMessageId}`
+      `/conversations/${encodePathParam(
+        conversationId
+      )}/messages/${encodePathParam(conversationMessageId)}`
     );
   }
 
@@ -47,7 +55,7 @@ export class ConversationsResource {
   ): Promise<ApiResponse<ConversationMessage>> {
     return this.client.request(
       'POST',
-      `/conversations/${conversationId}/messages`,
+      `/conversations/${encodePathParam(conversationId)}/messages`,
       {
         body: payload,
       }

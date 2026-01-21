@@ -10,6 +10,9 @@ import type {
   UpdateListingRequest,
 } from '../types/listings.js';
 
+const encodePathParam = (value: number | string): string =>
+  encodeURIComponent(String(value));
+
 export class ListingsResource {
   private client: HostawayClient;
 
@@ -22,7 +25,7 @@ export class ListingsResource {
   }
 
   get(listingId: number | string): Promise<ApiResponse<Listing>> {
-    return this.client.request('GET', `/listings/${listingId}`);
+    return this.client.request('GET', `/listings/${encodePathParam(listingId)}`);
   }
 
   create(payload: CreateListingRequest): Promise<ApiResponse<Listing>> {
@@ -33,37 +36,52 @@ export class ListingsResource {
     listingId: number | string,
     payload: UpdateListingRequest
   ): Promise<ApiResponse<Listing>> {
-    return this.client.request('PUT', `/listings/${listingId}`, { body: payload });
+    return this.client.request('PUT', `/listings/${encodePathParam(listingId)}`, {
+      body: payload,
+    });
   }
 
   delete(listingId: number | string): Promise<ApiResponse<unknown> | undefined> {
-    return this.client.request('DELETE', `/listings/${listingId}`);
+    return this.client.request('DELETE', `/listings/${encodePathParam(listingId)}`);
   }
 
   exportToAirbnb(
     listingId: number | string
   ): Promise<ApiResponse<unknown> | undefined> {
-    return this.client.request('POST', `/listings/${listingId}/export/airbnb`);
+    return this.client.request(
+      'POST',
+      `/listings/${encodePathParam(listingId)}/export/airbnb`
+    );
   }
 
   getFeeSettings(
     listingId: number | string
   ): Promise<ApiResponse<ListingFeeSettings>> {
-    return this.client.request('GET', `/listingFeeSettings/${listingId}`);
+    return this.client.request(
+      'GET',
+      `/listingFeeSettings/${encodePathParam(listingId)}`
+    );
   }
 
   updateFeeSettings(
     listingId: number | string,
     payload: ListingFeeSettingsRequest
   ): Promise<ApiResponse<ListingFeeSettings>> {
-    return this.client.request('POST', `/listingFeeSettings/${listingId}`, {
-      body: payload,
-    });
+    return this.client.request(
+      'POST',
+      `/listingFeeSettings/${encodePathParam(listingId)}`,
+      {
+        body: payload,
+      }
+    );
   }
 
   getListingUnit(
     listingMapId: number | string
   ): Promise<ApiResponse<ListingUnit>> {
-    return this.client.request('GET', `/listingUnits/${listingMapId}`);
+    return this.client.request(
+      'GET',
+      `/listingUnits/${encodePathParam(listingMapId)}`
+    );
   }
 }
