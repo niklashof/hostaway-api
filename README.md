@@ -219,19 +219,17 @@ const { result } = await client.calendar.get(12345, {
 
 // Update calendar
 const { result } = await client.calendar.update(12345, {
-  dateFrom: '2025-01-15',
-  dateTo: '2025-01-20',
+  startDate: '2025-01-15',
+  endDate: '2025-01-20',
   price: 150,
   isAvailable: 1,
 });
 
 // Batch update calendar intervals
-const { result } = await client.calendar.updateIntervals(12345, {
-  calendarIntervals: [
-    { startDate: '2025-02-01', endDate: '2025-02-07', price: 200 },
-    { startDate: '2025-02-08', endDate: '2025-02-14', price: 180 },
-  ],
-});
+const { result } = await client.calendar.updateIntervals(12345, [
+  { startDate: '2025-02-01', endDate: '2025-02-07', price: 200 },
+  { startDate: '2025-02-08', endDate: '2025-02-14', price: 180 },
+]);
 
 // Get price details
 const { result } = await client.calendar.priceDetails(12345, {
@@ -310,10 +308,10 @@ const { result } = await client.webhooks.listReservationWebhooks();
 const { result } = await client.webhooks.getReservationWebhook(123);
 const { result } = await client.webhooks.createReservationWebhook({
   url: 'https://example.com/webhook',
-  isActive: 1,
+  isEnabled: 1,
 });
 const { result } = await client.webhooks.updateReservationWebhook(123, {
-  isActive: 0,
+  isEnabled: 0,
 });
 await client.webhooks.deleteReservationWebhook(123);
 
@@ -321,15 +319,15 @@ await client.webhooks.deleteReservationWebhook(123);
 const { result } = await client.webhooks.listConversationMessageWebhooks();
 const { result } = await client.webhooks.createConversationMessageWebhook({
   url: 'https://example.com/messages',
-  isActive: 1,
+  isEnabled: 1,
 });
 
 // Unified webhooks (multiple event types)
 const { result } = await client.webhooks.listUnifiedWebhooks();
 const { result } = await client.webhooks.createUnifiedWebhook({
   url: 'https://example.com/unified',
-  isActive: 1,
-  eventTypes: ['reservation.created', 'reservation.updated'],
+  isEnabled: 1,
+  eventTypes: ['reservation created', 'reservation updated'],
 });
 ```
 
@@ -365,7 +363,7 @@ const { result } = await client.tasks.list();
 
 // List with filters
 const { result } = await client.tasks.list({
-  listingId: 12345,
+  reservationId: 12345,
   status: 'pending',
 });
 
@@ -374,7 +372,7 @@ const { result } = await client.tasks.get(12345);
 
 // Create a task
 const { result } = await client.tasks.create({
-  listingId: 12345,
+  listingMapId: 12345,
   title: 'Deep cleaning',
   description: 'Full property deep clean',
   // ... other fields
@@ -402,8 +400,10 @@ const { result } = await client.coupons.listReservationCoupons();
 
 // Apply coupon to reservation
 const { result } = await client.coupons.createReservationCoupon({
-  reservationId: 12345,
-  couponId: 67,
+  couponName: 'SUMMER25',
+  listingMapId: 12345,
+  startingDate: '2025-06-01',
+  endingDate: '2025-06-07',
 });
 ```
 
@@ -417,28 +417,34 @@ const { result } = await client.financial.getStandardField(12345);
 
 // Generate standard report
 const { result } = await client.financial.standardReport({
-  startDate: '2025-01-01',
-  endDate: '2025-12-31',
-  format: 'json',
+  listingMapIds: [12345],
+  fromDate: '2025-01-01',
+  toDate: '2025-12-31',
+  format: 'csv',
 });
 
 // Generate consolidated report
 const { result } = await client.financial.consolidatedReport({
-  startDate: '2025-01-01',
-  endDate: '2025-12-31',
+  listingMapIds: [12345],
+  fromDate: '2025-01-01',
+  toDate: '2025-12-31',
+  format: 'csv',
 });
 
 // Generate calculated report
 const { result } = await client.financial.calculatedReport({
-  startDate: '2025-01-01',
-  endDate: '2025-12-31',
+  listingMapIds: [12345],
+  fromDate: '2025-01-01',
+  toDate: '2025-12-31',
+  format: 'csv',
 });
 
 // Generate listing financials report
 const { result } = await client.financial.listingFinancialsReport({
-  startDate: '2025-01-01',
-  endDate: '2025-12-31',
-  listingId: 12345,
+  listingMapIds: [12345],
+  fromDate: '2025-01-01',
+  toDate: '2025-12-31',
+  format: 'csv',
 });
 ```
 

@@ -31,6 +31,7 @@ export interface ReservationUnit {
 export interface Reservation {
   id?: number;
   reservationId?: number;
+  listingMapId?: number;
   listingId?: number;
   channelId?: number;
   status?: ReservationStatus;
@@ -48,7 +49,7 @@ export interface Reservation {
 }
 
 export interface CreateReservationRequest {
-  listingId: number;
+  listingMapId: number;
   arrivalDate: ISODateString;
   departureDate: ISODateString;
   channelId?: number;
@@ -63,7 +64,7 @@ export interface CreateReservationRequest {
 }
 
 export type UpdateReservationRequest = Partial<
-  Omit<CreateReservationRequest, 'listingId' | 'channelId'>
+  Omit<CreateReservationRequest, 'channelId'>
 > & {
   [key: string]: unknown;
 };

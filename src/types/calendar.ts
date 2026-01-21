@@ -10,27 +10,42 @@ export interface CalendarListParams extends IncludeResourcesParams {
 }
 
 export interface CalendarDay {
+  id?: number;
   date?: ISODateString;
   listingUnitId?: number;
   status?: string;
-  available?: boolean;
+  isAvailable?: boolean | number;
+  isProcessed?: boolean | number;
   price?: number;
-  minStay?: number;
-  maxStay?: number;
-  closed?: boolean;
+  minimumStay?: number;
+  maximumStay?: number;
+  closedOnArrival?: boolean | number | null;
+  closedOnDeparture?: boolean | number | null;
+  note?: string | null;
+  countAvailableUnits?: number | null;
+  availableUnitsToSell?: number | null;
+  countPendingUnits?: number | null;
+  countBlockingReservations?: number | null;
+  countBlockedUnits?: number | null;
+  desiredUnitsToSell?: number | null;
   updatedAt?: ISODateTimeString;
   [key: string]: unknown;
 }
 
 export interface CalendarUpdatePayload {
-  date: ISODateString;
+  startDate: ISODateString;
+  endDate: ISODateString;
   listingUnitId?: number;
   status?: string;
-  available?: boolean;
+  isAvailable?: boolean | number;
+  isProcessed?: boolean | number;
   price?: number;
-  minStay?: number;
-  maxStay?: number;
-  closed?: boolean;
+  minimumStay?: number;
+  maximumStay?: number;
+  closedOnArrival?: boolean | number | null;
+  closedOnDeparture?: boolean | number | null;
+  note?: string | null;
+  desiredUnitsToSell?: number | null;
   [key: string]: unknown;
 }
 
@@ -41,11 +56,15 @@ export interface CalendarIntervalUpdatePayload {
   endDate: ISODateString;
   listingUnitId?: number;
   status?: string;
-  available?: boolean;
+  isAvailable?: boolean | number;
+  isProcessed?: boolean | number;
   price?: number;
-  minStay?: number;
-  maxStay?: number;
-  closed?: boolean;
+  minimumStay?: number;
+  maximumStay?: number;
+  closedOnArrival?: boolean | number | null;
+  closedOnDeparture?: boolean | number | null;
+  note?: string | null;
+  desiredUnitsToSell?: number | null;
   [key: string]: unknown;
 }
 
