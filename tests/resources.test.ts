@@ -53,6 +53,40 @@ describe('ListingsResource', () => {
       cleaningFee: 120,
     });
   });
+
+  it('builds listing get/delete/fee/unit endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.listings.get('listing/alpha');
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/listings/listing%2Falpha');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.listings.delete(12);
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/listings/12');
+    expect(init?.method).toBe('DELETE');
+
+    fetchMock.mockClear();
+    await client.listings.getFeeSettings(14);
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/listingFeeSettings/14');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.listings.getListingUnit('unit/42');
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/listingUnits/unit%2F42');
+    expect(init?.method).toBe('GET');
+  });
 });
 
 describe('ReservationsResource', () => {
@@ -96,6 +130,26 @@ describe('ReservationsResource', () => {
     parsed = new URL(url as string);
     expect(parsed.pathname).toBe('/reservations/44/statuses/cancelled');
     expect(init?.method).toBe('PUT');
+  });
+
+  it('builds reservation get/delete endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.reservations.get('res/77');
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/reservations/res%2F77');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.reservations.delete(99);
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/reservations/99');
+    expect(init?.method).toBe('DELETE');
   });
 });
 
@@ -189,5 +243,60 @@ describe('ConversationsResource', () => {
     expect(JSON.parse(init?.body as string)).toMatchObject({
       message: 'Hello there',
     });
+  });
+
+  it('builds conversation get/message endpoints', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = createClient(fetchMock);
+
+    await client.conversations.get('conv/alpha');
+    let [url, init] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/conversations/conv%2Falpha');
+    expect(init?.method).toBe('GET');
+
+    fetchMock.mockClear();
+    await client.conversations.getMessage('conv/alpha', 'msg/1');
+    [url, init] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.pathname).toBe('/conversations/conv%2Falpha/messages/msg%2F1');
+    expect(init?.method).toBe('GET');
+  });
+});
+
+describe('IncludeResources overrides', () => {
+  it('prefers per-request includeResources over client defaults', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() => jsonResponse({ ok: true }, { status: 200 }));
+    const client = new HostawayClient({
+      baseUrl: 'https://api.test',
+      fetch: fetchMock,
+      accessToken: 'token-1',
+      timeoutMs: 0,
+      includeResources: ['calendar', 'pricing'],
+    });
+
+    await client.listings.list({ limit: 1 });
+    let [url] = fetchMock.mock.calls[0];
+    let parsed = new URL(url as string);
+    expect(parsed.searchParams.getAll('includeResources')).toEqual([
+      'calendar',
+      'pricing',
+    ]);
+
+    fetchMock.mockClear();
+    await client.listings.list({ limit: 1, includeResources: false });
+    [url] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.searchParams.getAll('includeResources')).toEqual(['false']);
+
+    fetchMock.mockClear();
+    await client.listings.list({ limit: 1, includeResources: ['photos'] });
+    [url] = fetchMock.mock.calls[0];
+    parsed = new URL(url as string);
+    expect(parsed.searchParams.getAll('includeResources')).toEqual(['photos']);
   });
 });
