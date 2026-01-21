@@ -73,6 +73,7 @@ export class HostawayClient {
     while (true) {
       let response: Response;
       let didTimeout = false;
+      let hadAuthHeader = false;
 
       try {
         const { signal, cleanup, markTimedOut } = createRequestSignal(
@@ -80,8 +81,9 @@ export class HostawayClient {
           this.timeoutMs
         );
         const headers = await this.prepareHeaders(options.headers);
+        hadAuthHeader = headers.has('Authorization');
         const body = prepareBody(options.body, headers);
-        if (!headers.has('Authorization')) {
+        if (!hadAuthHeader) {
           const token = await this.auth.getAccessToken();
           headers.set('Authorization', `Bearer ${token}`);
         }
@@ -114,7 +116,12 @@ export class HostawayClient {
         });
       }
 
-      if (response.status === 401 && !authRetried && this.auth.canRefresh()) {
+      if (
+        response.status === 401 &&
+        !authRetried &&
+        !hadAuthHeader &&
+        this.auth.canRefresh()
+      ) {
         this.auth.invalidateToken();
         authRetried = true;
         continue;
