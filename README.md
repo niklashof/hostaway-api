@@ -416,7 +416,8 @@ Generate financial reports.
 const { result } = await client.financial.getStandardField(12345);
 
 // Generate standard report
-const { result } = await client.financial.standardReport({
+// Reports return CSV text when format is "csv".
+const report = await client.financial.standardReport({
   listingMapIds: [12345],
   fromDate: '2025-01-01',
   toDate: '2025-12-31',
@@ -424,7 +425,7 @@ const { result } = await client.financial.standardReport({
 });
 
 // Generate consolidated report
-const { result } = await client.financial.consolidatedReport({
+const consolidatedReport = await client.financial.consolidatedReport({
   listingMapIds: [12345],
   fromDate: '2025-01-01',
   toDate: '2025-12-31',
@@ -432,7 +433,7 @@ const { result } = await client.financial.consolidatedReport({
 });
 
 // Generate calculated report
-const { result } = await client.financial.calculatedReport({
+const calculatedReport = await client.financial.calculatedReport({
   listingMapIds: [12345],
   fromDate: '2025-01-01',
   toDate: '2025-12-31',
@@ -440,7 +441,7 @@ const { result } = await client.financial.calculatedReport({
 });
 
 // Generate listing financials report
-const { result } = await client.financial.listingFinancialsReport({
+const listingFinancialsReport = await client.financial.listingFinancialsReport({
   listingMapIds: [12345],
   fromDate: '2025-01-01',
   toDate: '2025-12-31',

@@ -40,5 +40,4 @@ export interface FinancialReportRequest {
 export type FinancialReportResult =
   | string
   | Record<string, unknown>
-  | Array<Record<string, unknown>>
-  | unknown[];
+  | Array<Record<string, unknown>>;

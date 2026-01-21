@@ -27,7 +27,7 @@ export class FinancialResource {
 
   standardReport(
     payload: FinancialReportRequest
-  ): Promise<ApiResponse<FinancialReportResult>> {
+  ): Promise<FinancialReportResult> {
     return this.client.request('POST', '/finance/report/standard', {
       body: payload,
     });
@@ -35,7 +35,7 @@ export class FinancialResource {
 
   consolidatedReport(
     payload: FinancialReportRequest
-  ): Promise<ApiResponse<FinancialReportResult>> {
+  ): Promise<FinancialReportResult> {
     return this.client.request('POST', '/finance/report/consolidated', {
       body: payload,
     });
@@ -43,7 +43,7 @@ export class FinancialResource {
 
   calculatedReport(
     payload: FinancialReportRequest
-  ): Promise<ApiResponse<FinancialReportResult>> {
+  ): Promise<FinancialReportResult> {
     return this.client.request('POST', '/finance/report/calculated', {
       body: payload,
     });
@@ -51,7 +51,7 @@ export class FinancialResource {
 
   listingFinancialsReport(
     payload: FinancialReportRequest
-  ): Promise<ApiResponse<FinancialReportResult>> {
+  ): Promise<FinancialReportResult> {
     return this.client.request('POST', '/finance/report/listingFinancials', {
       body: payload,
     });
